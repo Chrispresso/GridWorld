@@ -29,11 +29,11 @@ _params = {
     },
     # Stats
     'Stats': {
-        'save_checkpoint_every_n_episodes': DefaultType(int, 10_000),
-        #'save_checkpoint_every_n_episodes': DefaultType(int, None),
+        # 'save_checkpoint_every_n_episodes': DefaultType(int, 10_000),
+        'save_checkpoint_every_n_episodes': DefaultType(int, None),
         'sliding_window_average': DefaultType(int, 100),
         # 'save_stats_every_n_episodes': DefaultType(int, 1),
-        'save_stats_every_n_episodes': DefaultType(int, 1),
+        'save_stats_every_n_episodes': DefaultType(int, None),
         'save_on_shutdown': DefaultType(bool, True)
     },
     # Game
@@ -159,7 +159,8 @@ class Config(object):
         if type(self._config_dict[section][k]) != type(lambda : None):
             default = _params[section][k]
             if type(default.options) == type(lambda x: x):
-                if not default.options(k):
+                _v = default.types(v)  # Cast to whatever required type
+                if not default.options(_v):
                     raise Exception(f"Option [{section}].{k} has an invalid value.")
             if default.options and self._config_dict[section][k] not in default.options:
                 raise Exception(f'Option [{section}].{k} must be one of {default.options}')
