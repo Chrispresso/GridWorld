@@ -3,6 +3,9 @@ import os
 import torch
 import numpy as np
 from typing import Any, Dict, Optional
+import torch.nn.functional as F
+import torch
+
 
 class DefaultType:
     def __init__(self, types: Any, default_value: Any, options: Optional[Any] = None):
@@ -14,9 +17,9 @@ class DefaultType:
 _params = {
     # DQN specific
     'DQN': {
-        'loss': DefaultType(str, 'mse'),
+        'loss': DefaultType(str, 'mse_loss', lambda x: 'loss' in x and x in dir(F)),
+        'optimizer': DefaultType(str, 'Adam', lambda x: x in dir(torch.optim)),
         'device': DefaultType(str, 'cuda:0' if torch.cuda.is_available() else 'cpu'),
-        'optimizer': DefaultType(str, 'adam'),
         'load_from_checkpoint': DefaultType(str, None),
         'eps_start': DefaultType(float, 1.0, lambda x: x > 0.0 and x <= 1.0),
         'eps_end': DefaultType(float, 0.01, lambda x: x > 0.0 and x <= 1.0),
@@ -46,7 +49,8 @@ _params = {
         'allow_light_source': DefaultType(bool, True),
         'step_reward': DefaultType(float, -0.1),
         'target_reward': DefaultType(float, 1.0),
-        'fire_reward': DefaultType(float, -1.0)
+        'fire_reward': DefaultType(float, -1.0),
+        'max_steps': DefaultType(int, 250),
     }
 }
 

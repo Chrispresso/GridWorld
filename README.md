@@ -44,7 +44,8 @@ The config file specifies the behavior of the game within Unity along with behav
 
 Specific to controlling attributes related to the DQN.
 
-<b>loss</b> - The loss function to use. Defaults to MSE.<br>
+<b>loss</b> - The loss function to use. Defaults to `mse_loss`. Can be any `_loss` function found [here](https://pytorch.org/docs/stable/nn.functional.html).<br>
+<b>optimizer</b> - The optimizer to use. Defaults to `Adam`. Currently only supports default hyperparameters to the optimizer. Must be found [here](https://pytorch.org/docs/stable/optim.html). <br>
 <b>device</b> - Device to run the DQN on. This will attempt to run it on `cuda:0` if available and use `cpu` otherwise.<br>
 <b>optimizer</b> - Optimizer to use. Defaults to ADAM.<br>
 <b>load_from_checkpoint</b> - If you want to start the DQN from a `checkpoint.tar` file, this is where you can specify the path to it.<br>
@@ -110,13 +111,23 @@ If it is set, specify `save-checkpoint /path/to/folder` which you would like to 
 
 There may be a need to load from a checkpoint if your computer crashes or you wish to continue training from a certain point in time. For this you can specify `--load-checkpoint /path/to/checkpoint.tar`.
 
-### Saving stats
+### Saving Stats
 
 This is only needed if you have specified a frequency to save [stats](#stats). You can give a new location with `--save-stats /path/to/stats_to_create.csv`.
+
+### Running Within Unity
+
+There may be a time where you want to tweak behavior of the game without rebuilding. It's easy to do if you run the game within Unity. By specifying `--run-in-unity` you can do that. Have the Unity environment up and then you will be prompted to press `play` within Unity once Python has created the environment.
+
+### Changing Speed of the Environment
+
+It's possible that you might want to run the game within Unity and slow it down. By default the training happens as quickly as possible, but when you are testing, you may want to slow the actual game speed to see what is going on. You can specify `--time-between-decisions 0.5` and there will be 0.5 seconds between each decision that is made (roughly). This works both in Unity and within the prebuild binaries.
 
 ### Examples
 
 `grid_world.py --train` will begin training with the default config file.<br>
 `grid_world.py --test "C:\users\chris\documents\checkpoints\checkpoint_20000.tar"` will test the agent loaded from that checkpoint with the default config file.
 `grid_world.py --train -c "C:\users\chris\documents\custom_setting.config" --load-checkpoint "C:\users\chris\documents\checkpoints\checkpoint_20000.tar"` will begin training from the specified checkpoint and using the custom config file.<br>
-`grid_world.py --train -c "C:\users\chris\documents\custom_setting.config" --save-checkpoint "C:\users\chris\documents\new_checkpoints" --save-stats "C:\users\chris\documents\custom_setting.csv"` will begin training with a custom config file, saving checkpoints to a folder which will be created, and saving stats under a file which will also be created.
+`grid_world.py --train -c "C:\users\chris\documents\custom_setting.config" --save-checkpoint "C:\users\chris\documents\new_checkpoints" --save-stats "C:\users\chris\documents\custom_setting.csv"` will begin training with a custom config file, saving checkpoints to a folder which will be created, and saving stats under a file which will also be created.<br>
+`grid_world.py --train --run-in-unity` will begin training with all default parameters and will run within Unity.<br>
+`grid_world.py --test "C:\users\chris\documents\checkpoints\checkpoint_20000.tar" --run-in-unity` will begin testing an saved checkpoint within Unity.<br>

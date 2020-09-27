@@ -7,7 +7,9 @@ using Unity.MLAgents.Sensors;
 public class GridWorldAgent : Agent {
     public GridArea gridArea;
     public Camera renderCamera;
-    public float timeBetweenDecisionsAtInference;
+    public float timeBetweenDecisions;
+    public int maxNumSteps;
+    public int numSteps;
 
     private float timeSinceDecision;
     private EnvironmentParameters environmentParameters;
@@ -31,9 +33,16 @@ public class GridWorldAgent : Agent {
         stepReward = environmentParameters.GetWithDefault("step_reward", -0.1f);
         targetReward = environmentParameters.GetWithDefault("target_reward", 1.0f);
         fireReward = environmentParameters.GetWithDefault("fire_reward", -1.0f);
+        // I don't like the way StepCount seems to work with Agent, so I'm making my own.
+        // numSteps will increment when the Agent actually takes an action. This allows me
+        // to slow the agent down without accidentally incrementing StepCount
+        maxNumSteps = (int)environmentParameters.GetWithDefault("max_steps", 250f);
+        MaxStep = 0; // Override the default Agent to think it runs indefinitely
+        timeBetweenDecisions = environmentParameters.GetWithDefault("time_between_decisions", 0f);
     }
 
     public override void OnEpisodeBegin() {
+        numSteps = 0;
         gridArea.ResetArea();
     }
 
@@ -81,8 +90,12 @@ public class GridWorldAgent : Agent {
         // Each non-terminal step starts with this reward
         SetReward(stepReward);
 
+        // If we exceeded the maximum number of steps
+        if (maxNumSteps != 0 && ++numSteps > maxNumSteps) {
+            EndEpisode();
+        }
         // If it's not a wall, then it's a valid move
-        if  (wallCount == 0) {
+        else if  (wallCount == 0) {
             transform.position = targetLoc;
             if (fireCount == 1) {
                 SetReward(fireReward);
@@ -124,15 +137,11 @@ public class GridWorldAgent : Agent {
             renderCamera.Render();
         }
 
-        if (Academy.Instance.IsCommunicatorOn) {
+        if (timeSinceDecision >= timeBetweenDecisions) {
+            timeSinceDecision = 0f;
             RequestDecision();
         } else {
-            if (timeSinceDecision >= timeBetweenDecisionsAtInference) {
-                timeSinceDecision = 0f;
-                RequestDecision();
-            } else {
-                timeSinceDecision += Time.fixedDeltaTime;
-            }
+            timeSinceDecision += Time.fixedDeltaTime;
         }
     }
 }

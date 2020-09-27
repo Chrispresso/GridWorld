@@ -14,6 +14,8 @@ def parse_args_and_init():
     parser.add_argument("--save-checkpoint", dest="save_checkpoint", default=None, required=False, help="/path/to/folder to save checkpoints")
     parser.add_argument("--load-checkpoint", dest="load_checkpoint", default=None, required=False, help="/path/to/checkpoint.tar to load from")
     parser.add_argument("--save-stats", dest="save_stats", default=None, required=False, help="/path/to/stats_to_create.csv")
+    parser.add_argument("--run-in-unity", dest="run_in_unity", default=False, action="store_true", required=False, help="Whether or not to run within the Unity environment rather than a binary game")
+    parser.add_argument("--time-between-decisions", dest="time_between_decisions", default=0.0, required=False, help="Time between making decisions in the environment. Will slow down visualization")
 
     args = parser.parse_args()
     colorama.init()
@@ -52,6 +54,8 @@ def parse_args_and_init():
     config._config_dict['RuntimeArgs']['test'] = args.test
     config._config_dict['RuntimeArgs']['save_stats'] = args.save_stats
     config._config_dict['RuntimeArgs']['save_checkpoint'] = args.save_checkpoint
+    config._config_dict['RuntimeArgs']['run_in_unity'] = bool(args.run_in_unity)
+    config._config_dict['RuntimeArgs']['time_between_decisions'] = args.time_between_decisions
     new_dot = DotNotation(config._config_dict)
     config.__dict__.update(new_dot.__dict__)
 

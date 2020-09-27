@@ -43,6 +43,8 @@ public class GridArea : MonoBehaviour
         agentCamera = transform.Find("AgentCamera").GetComponent<Camera>();
         environmentObjectTypes = new[] { target, fire };
         gameObjects = new List<GameObject>();
+
+        UnityEngine.Random.InitState(System.Environment.TickCount);
     }
 
     /// <summary>
@@ -85,7 +87,7 @@ public class GridArea : MonoBehaviour
             vals.Add(UnityEngine.Random.Range(0, 7*7));
         }
         int[] generatedVals = vals.ToArray();
-        
+
         int xLoc, yLoc;
         // Instantiate the objects at the random locations throughout the grid.
         // The first generate value is for the agent, so just skip over it.

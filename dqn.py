@@ -111,8 +111,8 @@ class DQNAgent:
         self.gamma = config.DQN.gamma
         self.soft_update_every_n = config.DQN.soft_update_every_n_episodes
 
-        # @TODO: make the optim configurable
-        self.optimizer = torch.optim.Adam(self.local_net.parameters())
+        self.loss = getattr(F, config.DQN.loss)
+        self.optimizer = getattr(torch.optim, config.DQN.optimizer)(self.local_net.parameters())
         self.experience_replay = ExperienceReplayBuffer(buffer_size, batch_size, config)
 
     def learn(self, experiences: Tuple[Experience]) -> None:
@@ -129,9 +129,8 @@ class DQNAgent:
         # Clear gradient and minimize
         self.local_net.train()
         self.optimizer.zero_grad()
-        #@TODO: Add loss to config
-        loss = F.mse_loss(state_action_vals, expected_state_action_values)
-        loss.backward()
+        self.loss(state_action_vals, expected_state_action_values)
+        self.loss.backward()
         self.optimizer.step()
 
         self.soft_update()
