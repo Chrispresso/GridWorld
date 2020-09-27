@@ -53,6 +53,7 @@ Specific to controlling attributes related to the DQN.
 <b>eps_decay</b> - Decay rate of epsilon. Defaults to `0.99` and must be within `(0.0, 1.0)`.<br>
 <b>tau</b> - Controls the amount of soft update between target and local network. Defaults to `1e-3` and must be larger than `0.0`.
 <b>gamma</b> - Discount factor for the target network. Defaults to `0.99` and must be within `(0.0, 1.0)`.
+<b>soft_update_every_n_episodes</b> - The frequency to perform a soft update of the local network. Defaults to `4`.
 
 ### Experience Replay
 
@@ -92,7 +93,7 @@ Command line arguments are used in conjuction with the [config](#understanding-c
 
 ### Training
 
-`--train` can be added to specify you want to enter training mode with an agent. This will load any configs necessary and can also be used with a [checkpoint](#load-checkpoint).
+`--train` can be added to specify you want to enter training mode with an agent. This will load any configs necessary and can also be used with a [checkpoint](#dqn).
 
 ### Testing
 

@@ -22,7 +22,8 @@ _params = {
         'eps_end': DefaultType(float, 0.01, lambda x: x > 0.0 and x <= 1.0),
         'eps_decay': DefaultType(float, 0.99, lambda x: x > 0.0 and x < 1.0),
         'tau': DefaultType(float, 1e-3, lambda x: x > 0),
-        'gamma': DefaultType(float, 0.99, lambda x: x > 0.0 and x < 1.0)
+        'gamma': DefaultType(float, 0.99, lambda x: x > 0.0 and x < 1.0),
+        'soft_update_every_n_episodes': DefaultType(int, 4, lambda x: x > 0)
     },
     # Experience replay
     'ExperienceReplay': {

@@ -97,7 +97,7 @@ class QNetwork(nn.Module):
 
 class DQNAgent:
     def __init__(self, input_shape: Tuple[int, int, int], num_actions: int, config: Config):
-        self._i = 0
+        self._step = 0
         self.num_actions = num_actions
         self.device = config.DQN.device
         buffer_size = config.ExperienceReplay.memory_size
@@ -109,6 +109,7 @@ class DQNAgent:
 
         self.tau = config.DQN.tau
         self.gamma = config.DQN.gamma
+        self.soft_update_every_n = config.DQN.soft_update_every_n_episodes
 
         # @TODO: make the optim configurable
         self.optimizer = torch.optim.Adam(self.local_net.parameters())
@@ -122,7 +123,7 @@ class DQNAgent:
         # Get state-action values for next_states assuming greedy-policy
         # unsqueeze to go from shape [batch] to [batch, 1]
         state_action_vals_next_states = self.target_net(next_states).detach().max(1)[0].unsqueeze(1)
-        # Compute expected #@TODO: Make gamma a config
+        # Compute expected
         expected_state_action_values = rewards + (self.gamma * state_action_vals_next_states * (1 - dones))
 
         # Clear gradient and minimize
@@ -142,12 +143,12 @@ class DQNAgent:
     def step(self, experience: Experience) -> None:
         self.experience_replay.add_experience(experience)
 
-        #@TODO: make %4 part of the config
-        if len(self.experience_replay) > 64 and (self._i + 1) % 4 == 0:
+        self._step = (self._step + 1) % self.soft_update_every_n
+        if len(self.experience_replay) > 64 and self._step == 0:
             experiences = self.experience_replay.sample()
             self.learn(experiences)
 
-        self._i += 1
+        self._step += 1
     
     def act(self, state: np.ndarray, eps) -> int:
         # Convert state to [1, N] where N is the number of state dimensions
@@ -164,7 +165,6 @@ class DQNAgent:
             return np.argmax(action_vals.cpu().data.numpy())
 
 def save_checkpoint(agent: DQNAgent, episode: int, eps: float, eps_end: float, eps_decay: float, path: str) -> None:
-    #@TODO: add tau,gamma,loss?
     torch.save({
         'episode': episode,
         'eps': eps,
@@ -176,17 +176,8 @@ def save_checkpoint(agent: DQNAgent, episode: int, eps: float, eps_end: float, e
     }, path)
 
 def load_checkpoint(agent: DQNAgent, path: str) -> Tuple[int, float, float, float]:
-    #@TODO: clean this up properly
     checkpoint = torch.load(path)
     agent.local_net.load_state_dict(checkpoint['local_model_state_dict'])
     agent.target_net.load_state_dict(checkpoint['target_model_state_dict'])
-    # agent.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-    return 1, 0.01, 0.01, .99
+    agent.optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
     return (checkpoint['episode'], checkpoint['eps'], checkpoint['eps_end'], checkpoint['eps_decay'])
-
-def convert_to_onnx(agent: DQNAgent, path: str) -> None:
-    model = agent.local_net
-    x = torch.randn(1, 84, 84, 3).to(device)  # (NHWC)
-    torch.onnx.export(model, x, path, verbose=True, export_params=True,
-                      do_constant_folding=True,
-                      output_names=['action'])
