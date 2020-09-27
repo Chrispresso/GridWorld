@@ -20,7 +20,9 @@ _params = {
         'load_from_checkpoint': DefaultType(str, None),
         'eps_start': DefaultType(float, 1.0, lambda x: x > 0.0 and x <= 1.0),
         'eps_end': DefaultType(float, 0.01, lambda x: x > 0.0 and x <= 1.0),
-        'eps_decay': DefaultType(float, 0.99, lambda x: x > 0.0 and x < 1.0)
+        'eps_decay': DefaultType(float, 0.99, lambda x: x > 0.0 and x < 1.0),
+        'tau': DefaultType(float, 1e-3, lambda x: x > 0),
+        'gamma': DefaultType(float, 0.99, lambda x: x > 0.0 and x < 1.0)
     },
     # Experience replay
     'ExperienceReplay': {

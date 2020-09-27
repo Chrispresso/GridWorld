@@ -9,9 +9,6 @@ import random
 from config import Config
 
 
-TAU = 1e-3  # @TODO: Make this part of config
-# device = 'cpu'
-
 class Experience(NamedTuple):
     state: np.ndarray
     action: np.ndarray
@@ -109,6 +106,10 @@ class DQNAgent:
         self.local_net = QNetwork(input_shape, num_actions).to(self.device)
         self.target_net = QNetwork(input_shape, num_actions).to(self.device)
         self.target_net.load_state_dict(self.local_net.state_dict())
+
+        self.tau = config.DQN.tau
+        self.gamma = config.DQN.gamma
+
         # @TODO: make the optim configurable
         self.optimizer = torch.optim.Adam(self.local_net.parameters())
         self.experience_replay = ExperienceReplayBuffer(buffer_size, batch_size, config)
@@ -122,11 +123,12 @@ class DQNAgent:
         # unsqueeze to go from shape [batch] to [batch, 1]
         state_action_vals_next_states = self.target_net(next_states).detach().max(1)[0].unsqueeze(1)
         # Compute expected #@TODO: Make gamma a config
-        expected_state_action_values = rewards + (0.99 * state_action_vals_next_states * (1 - dones))
+        expected_state_action_values = rewards + (self.gamma * state_action_vals_next_states * (1 - dones))
 
         # Clear gradient and minimize
         self.local_net.train()
         self.optimizer.zero_grad()
+        #@TODO: Add loss to config
         loss = F.mse_loss(state_action_vals, expected_state_action_values)
         loss.backward()
         self.optimizer.step()
@@ -135,11 +137,12 @@ class DQNAgent:
 
     def soft_update(self) -> None:
         for target_param, policy_param in zip(self.target_net.parameters(), self.local_net.parameters()):
-            target_param.data.copy_(TAU*policy_param.data + (1.0-TAU)*target_param.data)
+            target_param.data.copy_(self.tau*policy_param.data + (1.0-self.tau)*target_param.data)
 
     def step(self, experience: Experience) -> None:
         self.experience_replay.add_experience(experience)
 
+        #@TODO: make %4 part of the config
         if len(self.experience_replay) > 64 and (self._i + 1) % 4 == 0:
             experiences = self.experience_replay.sample()
             self.learn(experiences)
@@ -161,6 +164,7 @@ class DQNAgent:
             return np.argmax(action_vals.cpu().data.numpy())
 
 def save_checkpoint(agent: DQNAgent, episode: int, eps: float, eps_end: float, eps_decay: float, path: str) -> None:
+    #@TODO: add tau,gamma,loss?
     torch.save({
         'episode': episode,
         'eps': eps,
@@ -172,6 +176,7 @@ def save_checkpoint(agent: DQNAgent, episode: int, eps: float, eps_end: float, e
     }, path)
 
 def load_checkpoint(agent: DQNAgent, path: str) -> Tuple[int, float, float, float]:
+    #@TODO: clean this up properly
     checkpoint = torch.load(path)
     agent.local_net.load_state_dict(checkpoint['local_model_state_dict'])
     agent.target_net.load_state_dict(checkpoint['target_model_state_dict'])

@@ -85,20 +85,7 @@ public class GridArea : MonoBehaviour
             vals.Add(UnityEngine.Random.Range(0, 7*7));
         }
         int[] generatedVals = vals.ToArray();
-
-        // @TODO: remove
-        // vals = new HashSet<int>();
-        // vals.Add(0); // agent
-        // vals.Add(49); // target
-        // vals.Add(35);
-        // vals.Add(36);
-        // vals.Add(37);
-        // vals.Add(50);
-        // for (int i = 6; i > 0; i--) {
-        //     vals.Add(9);
-        // }
-        // generatedVals = vals.ToArray();
-
+        
         int xLoc, yLoc;
         // Instantiate the objects at the random locations throughout the grid.
         // The first generate value is for the agent, so just skip over it.
