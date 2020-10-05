@@ -111,8 +111,9 @@ class DQNAgent:
         self.gamma = config.DQN.gamma
         self.soft_update_every_n = config.DQN.soft_update_every_n_episodes
 
-        self.loss = getattr(F, config.DQN.loss)
+        self.loss_func = getattr(F, config.DQN.loss)
         self.optimizer = getattr(torch.optim, config.DQN.optimizer)(self.local_net.parameters())
+        
         self.experience_replay = ExperienceReplayBuffer(buffer_size, batch_size, config)
 
     def learn(self, experiences: Tuple[Experience]) -> None:
@@ -129,8 +130,8 @@ class DQNAgent:
         # Clear gradient and minimize
         self.local_net.train()
         self.optimizer.zero_grad()
-        self.loss(state_action_vals, expected_state_action_values)
-        self.loss.backward()
+        loss = self.loss_func(state_action_vals, expected_state_action_values)
+        loss.backward()
         self.optimizer.step()
 
         self.soft_update()
@@ -143,11 +144,9 @@ class DQNAgent:
         self.experience_replay.add_experience(experience)
 
         self._step = (self._step + 1) % self.soft_update_every_n
-        if len(self.experience_replay) > 64 and self._step == 0:
+        if len(self.experience_replay) > 64 and self._step ==  0:
             experiences = self.experience_replay.sample()
             self.learn(experiences)
-
-        self._step += 1
     
     def act(self, state: np.ndarray, eps) -> int:
         # Convert state to [1, N] where N is the number of state dimensions

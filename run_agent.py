@@ -146,6 +146,7 @@ def _run_agent_one_ep(env: BaseEnv, agent: DQNAgent, config: Config,
                         eps: float, behavior_name: str, train: Optional[bool] = True):
     # Get a starting state
     env.reset()
+
     decision_steps, terminal_steps = env.get_steps(behavior_name)
     state = decision_steps.obs[0]
 
@@ -156,7 +157,6 @@ def _run_agent_one_ep(env: BaseEnv, agent: DQNAgent, config: Config,
     import time
     while not done:
         reward = 0.0
-        # time.sleep(0.5)
         # Get and perform an action
         action = agent.act(decision_steps.obs[0], eps)
         env.set_actions(behavior_name, np.expand_dims(action, 0).reshape(-1, 1))
