@@ -37,7 +37,7 @@ def get_environment(config: Config) -> BaseEnv:
     channel.set_float_parameter("target_reward", config.Game.target_reward)
     channel.set_float_parameter("fire_reward", config.Game.fire_reward)
     channel.set_float_parameter("max_steps", config.Game.max_steps)
-    channel.set_float_parameter("time_between_decisions", config.RuntimeArgs.time_between_decisions)
+    channel.set_float_parameter("time_scale", config.RuntimeArgs.time_scale)
 
     return env
 

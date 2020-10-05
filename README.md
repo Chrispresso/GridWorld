@@ -121,7 +121,7 @@ There may be a time where you want to tweak behavior of the game without rebuild
 
 ### Changing Speed of the Environment
 
-It's possible that you might want to run the game within Unity and slow it down. By default the training happens as quickly as possible, but when you are testing, you may want to slow the actual game speed to see what is going on. You can specify `--time-between-decisions 0.5` and there will be 0.5 seconds between each decision that is made (roughly). This works both in Unity and within the prebuild binaries.
+It's possible that you might want to run the game within Unity and slow it down. You can specify `--time-scale <float>` to change this. By default it's set to `1.0`. This changes Unity's `Time.timeScale`, so use caution as setting it too high may have consequences on the physics engine.
 
 ### Examples
 
@@ -131,3 +131,4 @@ It's possible that you might want to run the game within Unity and slow it down.
 `grid_world.py --train -c "C:\users\chris\documents\custom_setting.config" --save-checkpoint "C:\users\chris\documents\new_checkpoints" --save-stats "C:\users\chris\documents\custom_setting.csv"` will begin training with a custom config file, saving checkpoints to a folder which will be created, and saving stats under a file which will also be created.<br>
 `grid_world.py --train --run-in-unity` will begin training with all default parameters and will run within Unity.<br>
 `grid_world.py --test "C:\users\chris\documents\checkpoints\checkpoint_20000.tar" --run-in-unity` will begin testing an saved checkpoint within Unity.<br>
+`grid_world.py --train --run-in-unity --time-scale 5` will begin training with all default parameters and run within Unity at 5x speed.<br>
