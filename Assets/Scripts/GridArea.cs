@@ -82,9 +82,9 @@ public class GridArea : MonoBehaviour
         // Generate a random location on the grid for each fire and target + one agent.
         // The first entry will be for the agent's spawn location.
         HashSet<int> vals = new HashSet<int>();
-        vals.Add(UnityEngine.Random.Range(0, 7*7));  // Agent
+        vals.Add(UnityEngine.Random.Range(0, 8*8));  // Agent
         while (vals.Count < environmentObjects.Length + 1) {
-            vals.Add(UnityEngine.Random.Range(0, 7*7));
+            vals.Add(UnityEngine.Random.Range(0, 8*8));
         }
         int[] generatedVals = vals.ToArray();
 
@@ -92,15 +92,15 @@ public class GridArea : MonoBehaviour
         // Instantiate the objects at the random locations throughout the grid.
         // The first generate value is for the agent, so just skip over it.
         for (int i = 1; i < generatedVals.Length; i++) {
-            xLoc = generatedVals[i] / 7;
-            yLoc = generatedVals[i] % 7;
+            xLoc = generatedVals[i] / 8;
+            yLoc = generatedVals[i] % 8;
             GameObject obj = Instantiate(environmentObjectTypes[environmentObjects[i - 1]], transform);
             obj.transform.localPosition = new Vector3(xLoc - 3.5f, 0.5f, yLoc - 3.5f);
             gameObjects.Add(obj);
         }
         // Move the agent
-        xLoc = generatedVals[0] / 7;
-        yLoc = generatedVals[0] % 7;
+        xLoc = generatedVals[0] / 8;
+        yLoc = generatedVals[0] % 8;
         agent.transform.localPosition = new Vector3(xLoc - 3.5f, 0.5f, yLoc - 3.5f);
     }
 }
