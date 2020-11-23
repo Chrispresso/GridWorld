@@ -25,6 +25,10 @@ This uses a custom double DQN: one for local and one for a target network. This 
 
 This is split into two sections. One is dedicated to installing PyTorch, while the other installs the remaining dependencies.
 
+You can run this through Unity or with a prebuilt binary. If you want the prebuilt game you can grab the folder from [Dropbox](https://www.dropbox.com/sh/25vldmsalzvw2ap/AAAd2oh_WAPbpdH3x_SnY47ja?dl=0). Make sure you get `Build` if you are running on Windows and `Build.app` if you are running on Mac. If you're running on Mac and experience an issue try making the file executable if it's not: `cd Build.app/Contents/MacOS & chmod +x GridWorld`.
+
+Be sure to play either `Build` or `Build.app` under the GridWorld folder, i.e. `/path/to/GridWorld/Build` or `/path/to/GridWorld/Build.app`.
+
 ### Installing PyTorch
 
 I'm not making this part of the `requirements.txt` because there might be different ways you want to install PyTorch. Take a look at https://pytorch.org/.</br>

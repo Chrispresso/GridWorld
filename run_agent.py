@@ -1,4 +1,5 @@
 import os
+import sys
 from typing import NamedTuple, Optional
 import numpy as np
 import torch
@@ -9,7 +10,6 @@ from datetime import datetime
 from mlagents_envs.environment import UnityEnvironment, BaseEnv
 from mlagents_envs.side_channel.environment_parameters_channel import EnvironmentParametersChannel
 from mlagents_envs.side_channel.engine_configuration_channel import EngineConfigurationChannel
-import os
 from collections import deque
 import csv
 from dqn import QNetwork, Experience, ExperienceReplayBuffer, DQNAgent, save_checkpoint, load_checkpoint
@@ -22,8 +22,14 @@ def get_environment(config: Config) -> BaseEnv:
     if config.RuntimeArgs.run_in_unity:
         file_name = None
         print(Fore.CYAN + "Environment set. Press play within Unity" + Fore.RESET)
-    elif os.name == 'nt':
+    elif sys.platform.startswith("win"):
         file_name='Build/GridWorld.exe'
+    elif sys.platform.startswith("darwin"):
+        file_name='Build.app/Contents/MacOS/GridWorld'
+    elif sys.platform.startswith("linux"):
+        raise Exception("Tell chris to support linux")
+    else:
+        raise Exception("Unable to find which executable to run for system:" + sys.platform)
 
     # Load
     env = UnityEnvironment(file_name=file_name, side_channels=[channel])        
